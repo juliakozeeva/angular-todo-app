@@ -10,12 +10,18 @@ import { Todo } from '../../interfaces/todo';
 export class TodoListComponent implements OnInit {
 
   todos: Todo[];
+  todoTheme: string;
   todoTitle: string;
+  idForTodo: number;
+  filter: string;
 
   constructor() { }
 
   ngOnInit() {
+    this.todoTheme = '';
     this.todoTitle = '';
+    this.idForTodo = 5;
+    this.filter = 'all';
     this.todos = [
         {
           id: 1,
@@ -48,19 +54,60 @@ export class TodoListComponent implements OnInit {
     ];
   }
 
-  // addTodo(): void {
-  //   if (this.todoTitle.trim().length === 0) {
-  //     return;
-  //   }
+  addTodo(): void {
+    if (this.todoTitle.trim().length === 0) {
+      return;
+    }
 
-  //   this.todos.push( {
-  //     id: this.id,
+    this.todos.push({
+      id: this.idForTodo,
+      theme: this.todoTheme,
+      title: this.todoTitle,
+      completed: false,
+      editing: false
+    })
 
-  //   })
-  // }
+    this.todoTitle = '';
+    this.idForTodo++;
+  }
+
+  editTodo(todo: Todo): void {
+    todo.editing = true;
+  }
 
   deleteTodo(id: number): void {
     this.todos = this.todos.filter(todo => todo.id !== id);
   }
 
+  doneEdit(todo: Todo): void {
+    todo.editing = false;
+  }
+
+  remaining(): number {
+    return this.todos.filter(todo => !todo.completed).length;
+  }
+
+  atLeastOneCompleted(): boolean {
+    return this.todos.filter(todo => !todo.completed).length > 0;
+  }
+
+  clearCompleted(): void {
+    this.todos = this.todos.filter(todo => !todo.completed);
+  }
+
+  checkAllTodos(): void {
+    this.todos.forEach(todo => todo.completed = (event.target as HTMLInputElement).checked);
+  }
+
+  todosFiltered(): Todo[] {
+    if (this.filter === 'all') {
+      return this.todos;
+    } else if (this.filter === 'active') {
+      return this.todos.filter(todo => !todo.completed);
+    } else if (this.filter === 'completed') {
+      return this.todos.filter(todo => todo.completed);
+    }
+
+    return this.todos;
+  }
 }
